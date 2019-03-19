@@ -2,6 +2,7 @@
 package me.minu94.demoinfleanrestapi.events;
 
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +20,20 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RequestMapping(value = "api/events", produces = MediaTypes.HAL_JSON_UTF8_VALUE) //produces설정에 의해 모든 응답의 contentType은 HAL_JSON_UTF8_VALUE가 됨
 public class EventController {
 
+    private final ModelMapper modelMapper;
+
 
     private final EventRepository eventRepository;
 
-    public EventController(EventRepository eventRepository) {
+    public EventController(ModelMapper modelMapper, EventRepository eventRepository) {
+        this.modelMapper = modelMapper;
         this.eventRepository = eventRepository;
     }
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody Event event){
+    public ResponseEntity createEvent(@RequestBody EventDto eventDto){
+        Event event = modelMapper.map(eventDto, Event.class);   //입력받은 dto객체를 원래 entity객체로 변경
+
         Event newEvent = this.eventRepository.save(event);
 
         URI createUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
