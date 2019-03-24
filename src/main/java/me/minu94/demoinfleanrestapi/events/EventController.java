@@ -3,6 +3,7 @@ package me.minu94.demoinfleanrestapi.events;
 
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -31,7 +33,11 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody EventDto eventDto){
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors){
+        if (errors.hasErrors()){
+            return ResponseEntity.badRequest().build();
+        }
+
         Event event = modelMapper.map(eventDto, Event.class);   //입력받은 dto객체를 원래 entity객체로 변경
 
         Event newEvent = this.eventRepository.save(event);

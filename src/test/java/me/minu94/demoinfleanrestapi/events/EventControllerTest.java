@@ -17,7 +17,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.util.regex.Matcher;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -95,5 +94,16 @@ public class EventControllerTest {
                 .andExpect(jsonPath("free").value(Matchers.not(true)));
         //isCreated == 201 response
 
+    }
+
+
+    @Test
+    public void create_Bad_Request_Empty_Input()throws Exception{
+        EventDto eventDto = EventDto.builder().build();
+
+        this.mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
     }
 }
