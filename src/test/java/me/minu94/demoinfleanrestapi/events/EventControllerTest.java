@@ -90,7 +90,8 @@ public class EventControllerTest {
                 .andDo(print()) //어떤 요청과 응답이 왔는지 print됨
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
-                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(false))   //business logic test
+                .andExpect(jsonPath("offline").value(true)) //business logic test
                 .andExpect(jsonPath("free").value(Matchers.not(true)));
         //isCreated == 201 response
 
