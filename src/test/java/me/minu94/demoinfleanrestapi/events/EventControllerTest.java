@@ -92,7 +92,11 @@ public class EventControllerTest {
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("free").value(false))   //business logic test
                 .andExpect(jsonPath("offline").value(true)) //business logic test
-                .andExpect(jsonPath("free").value(Matchers.not(true)));
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update-event").exists())
+        ;
         //isCreated == 201 response
 
     }

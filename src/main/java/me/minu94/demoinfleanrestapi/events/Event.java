@@ -25,7 +25,7 @@ public class Event {
     private boolean offline;
     private boolean free;
     @Enumerated(EnumType.STRING) //default는 ordinary지만, string으로 저장하는 이유는 나중에 data가 추가될시 순서가 꼬일 수 있음.
-    private EventStatus eventStatus;
+    private EventStatus eventStatus = EventStatus.DRAFT;
 
 
     public void update(){
