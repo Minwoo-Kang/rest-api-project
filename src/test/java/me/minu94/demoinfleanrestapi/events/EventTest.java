@@ -1,10 +1,14 @@
 package me.minu94.demoinfleanrestapi.events;
 
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RunWith(JUnitParamsRunner.class)
 public class EventTest {
 
     @Test
@@ -34,72 +38,54 @@ public class EventTest {
 
 
     @Test
-    public void testFree(){
+    @Parameters(method = "paramsForTestFree")   //You can explicit annotation value using name convention like changing method name as "parametersForTestFree"
+    public void testFree(int basePrice,int maxPrice, boolean isFree){
         //Given
         Event event = Event.builder()
-                .basePrice(0)
-                .maxPrice(0)
+                .basePrice(basePrice)
+                .maxPrice(maxPrice)
                 .build();
 
         //When
         event.update();
 
         //Then
-        assertThat(event.isFree()).isTrue();
+        assertThat(event.isFree()).isEqualTo(isFree);
+    }
 
-        //Given
-        Event event2 = Event.builder()
-                .basePrice(100)
-                .maxPrice(0)
-                .build();
-
-        //When
-        event2.update();
-
-        //Then
-        assertThat(event2.isFree()).isFalse();
-
-        //Given
-        Event event3 = Event.builder()
-                .basePrice(0)
-                .maxPrice(100)
-                .build();
-
-        //When
-        event3.update();
-
-        //Then
-        assertThat(event3.isFree()).isFalse();
+    private Object[] paramsForTestFree(){
+        return new Object[]{
+                new Object[] {0,0, true},
+                new Object[] {100,0,true},
+                new Object[] {0,100,false},
+                new Object[] {100,200, false}
+        };
     }
 
     @Test
-    public void testOffline(){
+    @Parameters(method = "paramsForTestOffline")
+    public void testOffline(String location, boolean isOffline){
         //Given
         Event event = Event.builder()
                 .basePrice(0)
                 .maxPrice(0)
-                .location("Someplace to meet")
+                .location(location)
                 .build();
 
         //When
         event.update();
 
         //Then
-        assertThat(event.isOffline()).isTrue();
+        assertThat(event.isOffline()).isEqualTo(isOffline);
+    }
 
-        //Given
-        Event event2 = Event.builder()
-                .basePrice(0)
-                .maxPrice(0)
-                .location("Someplace to meet")
-                .build();
 
-        //When
-        event2.update();
-
-        //Then
-        assertThat(event2.isOffline()).isTrue();
-
+    private Object[] paramsForTestOffline(){
+        return new Object[]{
+            new Object[] {"강남 어딘가", true},
+            new Object[] {null, false},
+            new Object[] {"" , false},
+        };
     }
 
 }
