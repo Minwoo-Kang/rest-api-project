@@ -16,13 +16,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -99,10 +104,59 @@ public class EventControllerTest {
                 .andExpect(jsonPath("free").value(false))   //business logic test
                 .andExpect(jsonPath("offline").value(true)) //business logic test
                 .andExpect(jsonPath("free").value(Matchers.not(true)))
-                .andExpect(jsonPath("_links.self").exists())
-                .andExpect(jsonPath("_links.query-events").exists())
-                .andExpect(jsonPath("_links.update-event").exists())
-                .andDo(document("create-event"))
+//                .andExpect(jsonPath("_links.self").exists())  #this part will be tested in .andDo(document)
+//                .andExpect(jsonPath("_links.query-events").exists())
+//                .andExpect(jsonPath("_links.update-event").exists())
+//                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("create-event",
+                        links(
+                            linkWithRel("self").description("link to self"),
+                            linkWithRel("query-events").description("link to query events"),
+                            linkWithRel("update-event").description("link to update an existing event"),
+                            linkWithRel("profile").description("link to update an existing event")
+
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("description of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("beginning time of enrollment of new event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("closing time of enrollment of new event"),
+                                fieldWithPath("beginEventDateTime").description("beginning time of event"),
+                                fieldWithPath("endEventDateTime").description("closing time of event"),
+                                fieldWithPath("location").description("event location "),
+                                fieldWithPath("basePrice").description("base price of new event"),
+                                fieldWithPath("maxPrice").description("max price of new event"),
+                                fieldWithPath("limitOfEnrollment").description("limit of enrollment")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("Location Header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type")
+                        ),
+                        relaxedResponseFields(
+                                fieldWithPath("id").description("identifier of new event"),
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("description of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("beginning time of enrollment of new event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("closing time of enrollment of new event"),
+                                fieldWithPath("beginEventDateTime").description("beginning time of event"),
+                                fieldWithPath("endEventDateTime").description("closing time of event"),
+                                fieldWithPath("location").description("event location "),
+                                fieldWithPath("basePrice").description("base price of new event"),
+                                fieldWithPath("maxPrice").description("max price of new event"),
+                                fieldWithPath("limitOfEnrollment").description("limit of enrollment"),
+                                fieldWithPath("free").description("it tells if this event is free or not"),
+                                fieldWithPath("offline").description("it tells if this event is offline or online"),
+                                fieldWithPath("eventStatus").description("event status"),
+                                fieldWithPath("_links.self.href").description("link to self"),
+                                fieldWithPath("_links.query-events.href").description("link to query event"),
+                                fieldWithPath("_links.update-event.href").description("link to update event"),
+                                fieldWithPath("_links.profile.href").description("link to profile")
+                        )
+                ))
         ;
         //isCreated == 201 response
 
